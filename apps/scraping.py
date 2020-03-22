@@ -1,14 +1,32 @@
 # Import Splinter and BeautifulSoup
 from splinter import Browser
 from bs4 import BeautifulSoup
-
+import datetime as dt
 import pandas as pd
+import traceback
 
-# Set the executable path and initialize the chrome browser in splinter
-executable_path = {'executable_path': 'chromedriver.exe'}
-browser = Browser('chrome', **executable_path)
+def scrape_all():
+    
+    # Initiate headless driver for deployment
+    browser = Browser("chrome", executable_path="chromedriver", headless=True)
 
-def mars_news(browser)
+    news_title, news_paragraph = mars_news(browser)
+
+    # Run all scraping functions and store results in dictionary
+    data = {
+      "news_title": news_title,
+      "news_paragraph": news_paragraph,
+      "featured_image": featured_image(browser),
+      "facts": mars_facts(),
+      "last_modified": dt.datetime.now()
+    }
+
+    # Close the browser driver
+    browser.quit()
+
+    return data
+
+def mars_news(browser):
 
     # Visit the mars nasa news site
     url = 'https://mars.nasa.gov/news/'
@@ -75,19 +93,27 @@ def featured_image(browser):
 
 # LOOKING FOR THE TABLE
 
-def mars_facts()
+def mars_facts():
 
-    try
-         # Use 'read_html' to scrape the facts table into a dataframe
+    try:
+        
+        # Use 'read_html' to scrape the facts table into a dataframe
         df = pd.read_html('http://space-facts.com/mars/')[0]
         
-    except BaseException:
-        return: None
+    except BaseException as e:
+        print("MARS FACTS EXCEPTION !!!")
+        print(str(e))
+        traceback.print_exc()
+        return None
 
     # Assign columns and set index of dataframe
-    df.columns=['Description', 'Mars', 'Earth']
+    df.columns=['Description', 'Value']
     df.set_index('Description', inplace=True)
-    # Convert dataframe into HTML format, add bootstrap
+    # Convert dataframe into HTML format
+    
     return df.to_html()
 
-browser.quit()
+if __name__ == "__main__":
+    
+    # If running as script, print scraped data
+    print(scrape_all())

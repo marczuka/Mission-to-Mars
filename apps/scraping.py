@@ -114,10 +114,12 @@ def mars_facts():
 
     # Assign columns and set index of dataframe
     df.columns=['Description', 'Value']
-    df.set_index('Description', inplace=True)
-    # Convert dataframe into HTML format
+    #df.set_index('Description', inplace=True)
     
-    return df.to_html()
+    # Convert dataframe into a list of dictionaries
+    list_of_dict = [{'desc' : value[0], 'value': value[1]} for value in df.values]
+    
+    return list_of_dict
 
 def mars_hemispheres(browser):
 

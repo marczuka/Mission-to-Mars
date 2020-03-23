@@ -45,9 +45,27 @@
             </div>
             <!-- Mars Facts -->
             <div class="col-md-4">
-                <h4>Mars Facts</h4>
+                <h3>Mars Facts</h3>
                 <table class="table table-striped">
-                    {{ mars.facts | safe }}
+                    <thead>
+                      <tr>
+                        <th scope="col">Description</th>
+                        <th scope="col">Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Loop through mars.facts list of dictionaries -->
+                        {% for fact in mars.facts %}
+                        <tr>
+                            <th scope="row">
+                                {{ fact.desc }}
+                            </th>
+                            <td>
+                                {{ fact.value }}
+                            </td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
                 </table>
             </div>
          </div>

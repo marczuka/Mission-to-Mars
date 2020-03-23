@@ -123,31 +123,38 @@ def mars_facts():
 
 def mars_hemispheres(browser):
 
-    mars_hemispheres = [
-        {
-            "title": "kitty1",
-            "img_url": "https://live.staticflickr.com/3397/3551189653_501acccd41_b.jpg"
-        },
-        {
-            "title": "kitty2",
-            "img_url": "https://live.staticflickr.com/3397/3551189653_501acccd41_b.jpg"
-        },
-        {
-            "title": "kitty3",
-            "img_url": "https://live.staticflickr.com/3397/3551189653_501acccd41_b.jpg"
-        },
-        {
-            "title": "kitty4",
-            "img_url": "https://live.staticflickr.com/3397/3551189653_501acccd41_b.jpg"
-        }
-    ] 
+    # Empty list for the hemispheres data
+    mars_hemispheres = [] 
 
-    # Visit the astrology.usgs.gov web-site
+    # Scrape the web-site for the full resolution hemisphere images
+    # Visit the astrogeology.usgs.gov web-site
     url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
     browser.visit(url)
 
-    # Scrape the web-site for the full resolution hemisphere images
-    # TO DO HERE
+    # Optional delay for loading the page
+    browser.is_element_present_by_css("div div a img", wait_time=1)
+
+    for i in range(4):
+        
+        # Clicking the link for each hemisphere
+        hemi_url = browser.find_link_by_partial_text("Enhanced")[i]
+        hemi_url.click()
+    
+        # Parse the page with BeautifulSoup
+        html = browser.html
+        hemi_soup = BeautifulSoup(html, 'html.parser')
+    
+        # Get hemisphere name
+        hemi_name = hemi_soup.find('h2', class_="title").get_text()
+        
+        # Get hemisphere full resolution image link
+        hemi_link = hemi_soup.find('div', class_="downloads").find("a").get("href")
+    
+        # Add the hemisphere data to the list
+        mars_hemispheres.append({"title": hemi_name, "img_url": hemi_link})
+    
+        # Go back to the original page
+        browser.back()
 
     return mars_hemispheres
 

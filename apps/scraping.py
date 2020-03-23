@@ -10,14 +10,16 @@ def scrape_all():
     # Initiate headless driver for deployment
     browser = Browser("chrome", executable_path="chromedriver", headless=True)
 
-    news_title, news_paragraph = mars_news(browser)
+    news_title, news_paragraph, news_link = mars_news(browser)
 
     # Run all scraping functions and store results in dictionary
     data = {
       "news_title": news_title,
       "news_paragraph": news_paragraph,
+      "news_link": news_link,
       "featured_image": featured_image(browser),
       "facts": mars_facts(),
+      "hemispheres": mars_hemispheres(browser),
       "last_modified": dt.datetime.now()
     }
 
@@ -46,14 +48,18 @@ def mars_news(browser):
 
         # Use the parent element to find the first <a> tag and save it as a "news_title"
         news_title = slide_elem.find("div", class_='content_title').get_text()
+        
+        # Get the link for the featured article
+        news_link = slide_elem.find("div", class_='content_title').find("a").get("href")
+        news_link = f"https://mars.nasa.gov{news_link}"
 
         # Use the parent element to find the paragraph text
         news_p = slide_elem.find('div', class_="article_teaser_body").get_text()
     
     except AttributeError:
-        return None, None
+        return None, None, None
 
-    return news_title, news_p
+    return news_title, news_p, news_link
 
 # LOOKING FOR THE IMAGE
 
@@ -78,16 +84,16 @@ def featured_image(browser):
 
     try:
         # Find the relative image url
-        img_url_rel = img_soup.select_one('figure.lede a img').get("src")
+        # img_url_rel = img_soup.select_one('figure.lede a img').get("src")
 
         # Finding an image different way - by the unique class name
-        img_u = img_soup.find('img', class_='main_image').get("src")
+        img_url_rel = img_soup.find('img', class_='main_image').get("src")
     
     except AttributeError:
         return None
 
     # Use the base URL to create an absolute URL
-    img_url = f'https://www.jpl.nasa.gov{img_u}'
+    img_url = f'https://www.jpl.nasa.gov{img_url_rel}'
 
     return img_url
 
@@ -112,6 +118,37 @@ def mars_facts():
     # Convert dataframe into HTML format
     
     return df.to_html()
+
+def mars_hemispheres(browser):
+
+    mars_hemispheres = [
+        {
+            "title": "kitty1",
+            "img_url": "https://live.staticflickr.com/3397/3551189653_501acccd41_b.jpg"
+        },
+        {
+            "title": "kitty2",
+            "img_url": "https://live.staticflickr.com/3397/3551189653_501acccd41_b.jpg"
+        },
+        {
+            "title": "kitty3",
+            "img_url": "https://live.staticflickr.com/3397/3551189653_501acccd41_b.jpg"
+        },
+        {
+            "title": "kitty4",
+            "img_url": "https://live.staticflickr.com/3397/3551189653_501acccd41_b.jpg"
+        }
+    ] 
+
+    # Visit the astrology.usgs.gov web-site
+    url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    browser.visit(url)
+
+    # Scrape the web-site for the full resolution hemisphere images
+    # TO DO HERE
+
+    return mars_hemispheres
+
 
 if __name__ == "__main__":
     

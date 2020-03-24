@@ -126,7 +126,6 @@ def mars_hemispheres(browser):
     # Empty list for the hemispheres data
     mars_hemispheres = [] 
 
-    # Scrape the web-site for the full resolution hemisphere images
     # Visit the astrogeology.usgs.gov web-site
     url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
     browser.visit(url)
@@ -134,27 +133,33 @@ def mars_hemispheres(browser):
     # Optional delay for loading the page
     browser.is_element_present_by_css("div div a img", wait_time=1)
 
-    for i in range(4):
+    # Scrape the web-site for the full resolution hemisphere images
+    try:
+
+        for i in range(4):
         
-        # Clicking the link for each hemisphere
-        hemi_url = browser.find_link_by_partial_text("Enhanced")[i]
-        hemi_url.click()
+            # Clicking the link for each hemisphere
+            hemi_url = browser.find_link_by_partial_text("Enhanced")[i]
+            hemi_url.click()
     
-        # Parse the page with BeautifulSoup
-        html = browser.html
-        hemi_soup = BeautifulSoup(html, 'html.parser')
+            # Parse the page with BeautifulSoup
+            html = browser.html
+            hemi_soup = BeautifulSoup(html, 'html.parser')
     
-        # Get hemisphere name
-        hemi_name = hemi_soup.find('h2', class_="title").get_text()
+            # Get hemisphere name
+            hemi_name = hemi_soup.find('h2', class_="title").get_text()
         
-        # Get hemisphere full resolution image link
-        hemi_link = hemi_soup.find('div', class_="downloads").find("a").get("href")
+            # Get hemisphere full resolution image link
+            hemi_link = hemi_soup.find('div', class_="downloads").find("a").get("href")
     
-        # Add the hemisphere data to the list
-        mars_hemispheres.append({"title": hemi_name, "img_url": hemi_link})
+            # Add the hemisphere data to the list
+            mars_hemispheres.append({"title": hemi_name, "img_url": hemi_link})
     
-        # Go back to the original page
-        browser.back()
+            # Go back to the original page
+            browser.back()
+
+    except BaseException:
+        return None
 
     return mars_hemispheres
 
